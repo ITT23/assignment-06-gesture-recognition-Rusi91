@@ -6,7 +6,7 @@ import numpy as np
 
 class Point():
     # define parameter type: https://docs.python.org/3/library/typing.html [15.06.23]
-    def __init__(self, x:float, y:float):
+    def __init__(self, x:float, y:float, angle_range:float=45.0, angle_step:float=2.0):
         self.x = x
         self.y = y
 
@@ -25,29 +25,34 @@ class Recognizer():
     def __init__(self) -> None:
         pass
 
-    def resample(self, points, n):
-		
-        I = get_path_length(points) / float(n - 1)
-        D = 0.0
-        new_points = [points[0]]
-        
-        for i in range(len(points)):
-            distance = get_distance(points[i], points[i + 1])
-            if D + distance >= I:
-                
-                new_point_x = points[i].x + ((I - D) / distance) * (points[i].x - points[i].x)
-                new_point_y = points[i].y + ((I - D) / distance) * (points[i].y - points[i].y)
-                new_point = Point(new_point_x, new_point_y)
-                new_points.append(new_point)
-                points.insert(i, new_point)
-                D = 0.0
-            else:
-                D += distance
-                
-        if len(new_points) == n - 1:  # prevent a roundoff error
-            new_points.append(Point(points[len(points) - 1].x, points[len(points - 1)].y))
+    def recognize(points, templates):
+        b = math.inf
 
-        return new_points
+
+
+def resample(points, n=64):
+    
+    I = get_path_length(points) / float(n - 1)
+    D = 0.0
+    new_points = [points[0]]
+    
+    for i in range(len(points)):
+        distance = get_distance(points[i], points[i + 1])
+        if D + distance >= I:
+            
+            new_point_x = points[i].x + ((I - D) / distance) * (points[i].x - points[i].x)
+            new_point_y = points[i].y + ((I - D) / distance) * (points[i].y - points[i].y)
+            new_point = Point(new_point_x, new_point_y)
+            new_points.append(new_point)
+            points.insert(i, new_point)
+            D = 0.0
+        else:
+            D += distance
+            
+    if len(new_points) == n - 1:  # prevent a roundoff error
+        new_points.append(Point(points[len(points) - 1].x, points[len(points - 1)].y))
+
+    return new_points
     
 def get_path_length(points):
     distance = 0.0
