@@ -1,47 +1,12 @@
 # $1 gesture recognizer
 
 import math
-import numpy as np
 
 from point_class import Point
 from gesture_templates_dict import one_dollar_gesture_templates
 
 # golden ratio - phi
 PHI = 0.5 * (-1.0 + math.sqrt(5.0))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 class Rectangle():
 
@@ -55,18 +20,15 @@ class Rectangle():
 
 class Recognizer():
 
-    def __init__(self, angle:float=45.0, threshold:float=2.0, square_size:float=250, origin:Point=Point(0,0)):
-        #print(one_dollar_gesture_templates)
-        
-        self.templates_dict:dict = adjust_template_data(one_dollar_gesture_templates, square_size, origin)
+    def __init__(self, angle:float=45.0, threshold:float=2.0, size:float=250, origin:Point=Point(0,0)):
+        self.templates_dict:dict = adjust_template_data(one_dollar_gesture_templates, size, origin)
         self.angle = angle
         self.threshold = threshold
-        self.square_size = square_size
+        self.size = size
         self.origin = origin
 
-
     def recognize(self, input_points:list[Point]):
-        points = adjust_input_data(input_points, self.square_size, self.origin)
+        points = adjust_input_data(input_points, self.size, self.origin)
         b = math.inf
         matching_template:dict = None
         for key, value in self.templates_dict.items():
@@ -75,7 +37,7 @@ class Recognizer():
             if distance < b:
                 b = distance
                 matching_template = key
-        template_score = 1 - b / (0.5 * math.sqrt(self.square_size ** 2 + self.square_size ** 2))
+        template_score = 1 - b / (0.5 * math.sqrt(self.size ** 2 + self.size ** 2))
 
         print(matching_template)
         print(template_score)
