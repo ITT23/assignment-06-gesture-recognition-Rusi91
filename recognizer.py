@@ -3,17 +3,45 @@
 import math
 import numpy as np
 
+from point_class import Point
 from gesture_templates_dict import one_dollar_gesture_templates
 
 # golden ratio - phi
 PHI = 0.5 * (-1.0 + math.sqrt(5.0))
 
 
-class Point():
-    # define parameter type: https://docs.python.org/3/library/typing.html [15.06.23]
-    def __init__(self, x:float, y:float):
-        self.x = x
-        self.y = y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class Rectangle():
 
@@ -27,24 +55,52 @@ class Rectangle():
 
 class Recognizer():
 
-    def __init__(self, templates:dict, angle:float=45.0, threshold:float=2.0, square_size:float=250, origin:Point=Point(0,0)):
-        self.templates_dict = templates
+    def __init__(self, angle:float=45.0, threshold:float=2.0, square_size:float=250, origin:Point=Point(0,0)):
+        #print(one_dollar_gesture_templates)
+        
+        self.templates_dict:dict = adjust_template_data(one_dollar_gesture_templates, square_size, origin)
         self.angle = angle
         self.threshold = threshold
         self.square_size = square_size
         self.origin = origin
 
-    def recognize(self, points:list[Point]):
+
+    def recognize(self, input_points:list[Point]):
+        points = adjust_input_data(input_points, self.square_size, self.origin)
         b = math.inf
-        matching_template = None
-        for template in self.templates_dict:
-            distance = distance_at_best_angle(points, self.templates_dict.values, -self.angle, self.angle, self.threshold)
+        matching_template:dict = None
+        for key, value in self.templates_dict.items():
+            #points_list:list[Point] = self.templates_dict.values
+            distance = distance_at_best_angle(points, value, -self.angle, self.angle, self.threshold)
             if distance < b:
                 b = distance
-                matching_template = template
+                matching_template = key
         template_score = 1 - b / (0.5 * math.sqrt(self.square_size ** 2 + self.square_size ** 2))
 
+        print(matching_template)
+        print(template_score)
+
         return matching_template, template_score
+
+def adjust_template_data(templates_dict:dict, square_size, origin):
+    adjusted_templates:dict = {}
+    for key, value in templates_dict.items():
+        
+        value = resample(value)
+        radians = get_indicative_angle(value)
+        value = rotate_by(value, radians)
+        value = scale_to(value, square_size)
+        value = translate_to(value, origin)
+        adjusted_templates[key] = value
+    return adjusted_templates
+
+def adjust_input_data(points:list[Point], square_size, origin):
+    points = resample(points)
+    radians = get_indicative_angle(points)
+    points = rotate_by(points, radians)
+    points = scale_to(points, square_size)
+    points = translate_to(points, origin)
+    return points
 
 def resample(points:list[Point], n=64):
     
@@ -73,7 +129,7 @@ def resample(points:list[Point], n=64):
 def get_path_length(points:list[Point]):
     distance = 0.0
 
-    for i in range(len(points)):
+    for i in range(len(points) - 1):
         distance += get_distance(points[i], points[i + 1]) 
     
     return distance
@@ -82,7 +138,7 @@ def get_path_length(points:list[Point]):
 def get_distance(point_1:Point, point_2:Point):
     return math.dist([point_1.x, point_1.y], [point_2.x, point_2.y])
 
-def get_indicative_angle(points):
+def get_indicative_angle(points:list[Point]):
     centroid_point = centroid(points)
     return math.atan2(centroid_point.y - points[0].y, centroid_point.x - points[0].x)
 
@@ -99,7 +155,7 @@ def rotate_by(points:list[Point], radians):
     return new_points
 
 def scale_to(points:list[Point], size):
-    bbox= bounding_box(points)
+    bbox = bounding_box(points)
     new_points = []
     for i in range(len(points)):
         new_point_x = points[i].x * (size / bbox.width)
@@ -131,14 +187,15 @@ def centroid(points:list[Point]):
 
 def bounding_box(points:list[Point]):
     # infinity represenation in python: https://www.geeksforgeeks.org/python-infinity/ [15.06.23]
-    min_x, max_x = math.inf, -math.inf
-    min_y, max_y = math.inf, -math.inf
+    #min_x, max_x = math.inf, -math.inf
+    #min_y, max_y = math.inf, -math.inf
+    min_x, max_x, min_y, max_y = 0, 0, 0, 0
 
     for i in range(len(points)):
-        min_x = np.min(min_x, points[i].x)
-        min_y = np.min(min_y, points[i].y)
-        max_x = np.max(max_x, points[i].x)
-        max_y = np.max(max_x, points[i].y)
+        min_x = min(min_x, points[i].x)
+        min_y = min(min_y, points[i].y)
+        max_x = max(max_x, points[i].x)
+        max_y = max(max_x, points[i].y)
     
     return Rectangle(min_x, min_y, max_x - min_x, max_y - min_y)
 
@@ -148,12 +205,12 @@ def distance_at_best_angle(points:list[Point], template_values:list[Point], angl
     x2 = (1.0 - PHI) * angle_range_neg + PHI * angle_range_pos
     f2 = distance_at_angle(points, template_values, x2)
 
-    while np.abs(angle_range_pos - angle_range_neg) > threshold:
+    while abs(angle_range_pos - angle_range_neg) > threshold:
         if f1 < f2:
             angle_range_pos = x2
             x2 = x1
             f2 = f1
-            x1 = PHI * a + (1.0 - PHI) * angle_range_pos
+            x1 = PHI * angle_range_neg + (1.0 - PHI) * angle_range_pos
             f1 = distance_at_angle(points, template_values, x1)
         else:
             angle_range_neg = x1
@@ -162,7 +219,7 @@ def distance_at_best_angle(points:list[Point], template_values:list[Point], angl
             x2 = (1.0 - PHI) * angle_range_neg + PHI * angle_range_pos
             f2 = distance_at_angle(points, template_values, x2)
 
-    return np.min(f1, f2)
+    return min(f1, f2)
 
 def distance_at_angle(points:list[Point], template_values:list[Point], radians):
     new_points = rotate_by(points, radians)
@@ -175,6 +232,10 @@ def path_distance(points:list[Point], template_values:list[Point]):
         d += get_distance(points[i], template_values[i])
 
     return d / len(points)
+
+input_points =  [ Point(307,216), Point(333,186), Point(356,215), Point(375,186), Point(399,216), Point(418,186)]
+recognizer = Recognizer()
+recognizer.recognize(input_points)
 
 
     

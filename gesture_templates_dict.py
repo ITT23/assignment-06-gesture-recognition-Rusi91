@@ -1,6 +1,6 @@
-from recognizer import Point
+from point_class import Point
 
-one_dollar_gesture_templates = {
+one_dollar_gesture_templates:dict = {
     'triangle': [Point(137,139), Point(135,141), Point(133,144), Point(132,146), Point(130,149), Point(128,151), Point(126,155), Point(123,160), \
                  Point(120,166), Point(116,171), Point(112,177), Point(107,183), Point(102,188), Point(100,191), Point(95,195), Point(90,199), \
                     Point(86,203),  Point(82,206), Point(80,209),  Point(75,213),  Point(73,213),  Point(70,216),  Point(67,219),  Point(64,221),  \
