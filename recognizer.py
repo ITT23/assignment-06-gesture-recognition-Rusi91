@@ -27,11 +27,11 @@ DEFAULT_ANGLE_RANGE = 45.0
 DEFAULT_THRESHOLD = 2.0
 DEFAULT_SQUARE_SIZE = 250
 DEFAULT_ORIGIN = Point(0,0)
-DEFAULT_TEMPLATE_DICT = one_dollar_gesture_templates
+DEFAULT_TEMPLATE_DICT:dict = one_dollar_gesture_templates
 
 # used for the bounding box calculation
 class Rectangle():
-
+    
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
@@ -39,10 +39,10 @@ class Rectangle():
         self.height = height
 
 class Recognizer():
+
     # in case user don't explicitly define a parameter, default parameters are used
     def __init__(self, dollar_templates:dict=DEFAULT_TEMPLATE_DICT, angle:float=DEFAULT_ANGLE_RANGE, threshold:float=DEFAULT_THRESHOLD, \
                  size:float=DEFAULT_SQUARE_SIZE, origin:Point=DEFAULT_ORIGIN):
-        
         self.angle = angle
         self.threshold = threshold
         self.size = size
@@ -61,10 +61,9 @@ class Recognizer():
                 b = distance
                 matching_template = key
         template_score = 1 - b / (0.5 * math.sqrt(self.size ** 2 + self.size ** 2))
-
+        # print results
         print(matching_template)
         print(template_score)
-        
         return matching_template, template_score
     
 # loads, adjusts and returns predefined templates for the further recognition process
@@ -77,7 +76,6 @@ def load_templates(templates_dict:dict, size, origin):
         value = scale_to(value, size)
         value = translate_to(value, origin)
         adjusted_templates[key] = value
-
     return adjusted_templates
 
 # adjusts the input points for the recognition process
@@ -87,7 +85,6 @@ def adjust_input_data(points:list[Point], square_size, origin):
     points = rotate_by(points, radians)
     points = scale_to(points, square_size)
     points = translate_to(points, origin)
-
     return points
 
 # resample a points path into n evenly spaced points
@@ -115,12 +112,11 @@ def resample(points:list[Point], n=N):
 
     return new_points
 
-# returns distance/path
+# returns distance/path between a point p and point p+1
 def get_path_length(points:list[Point]):
     distance = 0.0
     for i in range(len(points) - 1):
         distance += get_distance(points[i], points[i + 1]) 
-
     return distance
 
 # calculate Euclidean distance between two point: https://www.w3schools.com/python/ref_math_dist.asp#:~:text=The%20math.,be%20of%20the%20same%20dimensions.[15.06.23]
@@ -143,7 +139,6 @@ def rotate_by(points:list[Point], radians):
         new_point_x = (points[i].x - centroid_point.x) * cos - (points[i].y - centroid_point.y) * sin + centroid_point.x
         new_point_y = (points[i].x - centroid_point.x) * sin + (points[i].y - centroid_point.y) * cos + centroid_point.y
         new_points.append(Point(new_point_x, new_point_y))
-
     return new_points
 
 # scale points so that the resulting bounding box will be of size**2 size
@@ -154,7 +149,6 @@ def scale_to(points:list[Point], size):
         new_point_x = points[i].x * (size / bbox.width)
         new_point_y = points[i].y * (size / bbox.height)
         new_points.append(Point(new_point_x, new_point_y))
-
     return new_points
 
 # translate points to the origin 
@@ -165,7 +159,6 @@ def translate_to(points:list[Point], origin:Point):
         new_point_x = points[i].x + origin.x - centroid_point.x
         new_point_y = points[i].y + origin.y - centroid_point.y
         new_points.append(Point(new_point_x, new_point_y))
-    
     return new_points
 
 # returns the centroid point
@@ -180,7 +173,7 @@ def centroid(points:list[Point]):
 
     return Point(x_sum, y_sum)
 
-# need for the scale_to method
+# needed for the scale_to method
 # returns a rectangle defined by (min of x, min of y), (max of x, max of y)
 def bounding_box(points:list[Point]):
     # infinity represenation in python: https://www.geeksforgeeks.org/python-infinity/ [15.06.23]
@@ -196,6 +189,7 @@ def bounding_box(points:list[Point]):
     
     return Rectangle(min_x, min_y, max_x - min_x, max_y - min_y)
 
+# returns distance at best angle between template and input points
 def distance_at_best_angle(points:list[Point], template_values:list[Point], angle_range_neg, angle_range_pos, threshold):
     x1 = PHI * angle_range_neg + (1.0 - PHI) * angle_range_pos
     f1 = distance_at_angle(points, template_values, x1)
@@ -218,22 +212,21 @@ def distance_at_best_angle(points:list[Point], template_values:list[Point], angl
 
     return min(f1, f2)
 
+# two following functions needed to get the path distance between template and input points
 def distance_at_angle(points:list[Point], template_values:list[Point], radians):
     new_points = rotate_by(points, radians)
-
     return path_distance(new_points, template_values)
 
 def path_distance(points:list[Point], template_values:list[Point]):
     d = 0.0
     for i in range(len(points)):
         d += get_distance(points[i], template_values[i])
-
     return d / len(points)
 
-input_points =  [ Point(307,216), Point(333,186), Point(356,215), Point(375,186), Point(399,216), Point(418,186)]
-recognizer = Recognizer()
-recognizer.load_templates()
-recognizer.recognize(input_points)
+# test recognizer with 'zick-zack' data
+#input_points =  [ Point(307,216), Point(333,186), Point(356,215), Point(375,186), Point(399,216), Point(418,186)] 
+#recognizer = Recognizer()
+#recognizer.recognize(input_points)
 
 
     
