@@ -179,6 +179,8 @@ def bounding_box(points:list[Point]):
     # infinity represenation in python: https://www.geeksforgeeks.org/python-infinity/ [15.06.23]
     #min_x, max_x = math.inf, -math.inf
     #min_y, max_y = math.inf, -math.inf
+
+    # infinity (suggested by the pseudocode) leads to some bugs while init the values with 0 performs without problems
     min_x, max_x, min_y, max_y = 0, 0, 0, 0
 
     for i in range(len(points)):
