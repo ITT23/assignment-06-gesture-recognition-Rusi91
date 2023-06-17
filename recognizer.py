@@ -40,7 +40,7 @@ class Rectangle():
 
 class Recognizer():
 
-    # in case user don't explicitly define a parameter, default parameters are used
+    # in case users don't explicitly define a parameter, default parameters are used
     def __init__(self, dollar_templates:dict=DEFAULT_TEMPLATE_DICT, angle:float=DEFAULT_ANGLE_RANGE, threshold:float=DEFAULT_THRESHOLD, \
                  size:float=DEFAULT_SQUARE_SIZE, origin:Point=DEFAULT_ORIGIN):
         self.angle = angle
@@ -93,22 +93,27 @@ def resample(points:list[Point], n=N):
     I = get_path_length(points) / float(n - 1)
     D = 0.0
     new_points = [points[0]]
+    i = 1
 
-    for i in range(len(points)):
-        distance = get_distance(points[i], points[i + 1])
+    while i < len(points):
+        distance = get_distance(points[i - 1], points[i])
         
         if D + distance >= I:
-            new_point_x = points[i].x + ((I - D) / distance) * (points[i].x - points[i].x)
-            new_point_y = points[i].y + ((I - D) / distance) * (points[i].y - points[i].y)
+            new_point_x = points[i - 1].x + ((I - D) / distance) * (points[i].x - points[i - 1].x)
+            new_point_y = points[i - 1].y + ((I - D) / distance) * (points[i].y - points[i - 1].y)
             new_point = Point(new_point_x, new_point_y)
             new_points.append(new_point)
             points.insert(i, new_point)
             D = 0.0
         else:
             D += distance
+        i += 1
+    
 
     if len(new_points) == n - 1:  # prevent a roundoff error
-        new_points.append(Point(points[len(points) - 1].x, points[len(points - 1)].y))
+        number:int = 1
+        new_points.append(Point(points[len(points)-number].x, points[len(points-number)].y))
+        new_points.append(Point(points[len(poins)]))
 
     return new_points
 
@@ -221,15 +226,30 @@ def distance_at_angle(points:list[Point], template_values:list[Point], radians):
 
 # get path distance 
 def path_distance(points:list[Point], template_values:list[Point]):
+    #print("jetzt")
+    #print(len(points))
+    #print(len(template_values))
+    
     d = 0.0
     for i in range(len(points)):
         d += get_distance(points[i], template_values[i])
     return d / len(points)
 
 # test recognizer with 'zick-zack' data
-#input_points =  [ Point(307,216), Point(333,186), Point(356,215), Point(375,186), Point(399,216), Point(418,186)] 
-#recognizer = Recognizer()
-#recognizer.recognize(input_points)
+input_points =  [Point(75,250), Point(75,247), Point(77,244), Point(78,242), Point(79,239), Point(80,237), Point(82,234), Point(82,232), Point(84,229), Point(85,225), \
+             Point(87,222), Point(88,219), Point(89,216), Point(91,212), Point(92,208), Point(94,204), Point(95,201), Point(96,196), Point(97,194), Point(98,191), Point(100,185), \
+                Point(102,178), Point(104,173), Point(104,171), Point(105,164), Point(106,158), Point(107,156), Point(107,152), Point(108,145), Point(109,141), Point(110,139), \
+                    Point(112,133), Point(113,131), Point(116,127), Point(117,125), Point(119,122), Point(121,121), Point(123,120), Point(125,122), Point(125,125), Point(127,130), \
+                        Point(128,133), Point(131,143), Point(136,153), Point(140,163), Point(144,172), Point(145,175), Point(151,189), Point(156,201), Point(161,213), \
+                            Point(166,225), Point(169,233), Point(171,236), Point(174,243), Point(177,247), Point(178,249), Point(179,251), Point(180,253), Point(180,255), \
+                                Point(179,257), Point(177,257), Point(174,255), Point(169,250), Point(164,247), Point(160,245), Point(149,238), Point(138,230), Point(127,221), \
+                                    Point(124,220), Point(112,212), Point(110,210), Point(96,201), Point(84,195), Point(74,190), Point(64,182), Point(55,175), Point(51,172), \
+                                        Point(49,170), Point(51,169), Point(56,169), Point(66,169), Point(78,168), Point(92,166), Point(107,164), Point(123,161), Point(140,162), \
+                                            Point(156,162), Point(171,160), Point(173,160), Point(186,160), Point(195,160), Point(198,161), Point(203,163), Point(208,163), \
+                                                Point(206,164), Point(200,167), Point(187,172), Point(174,179), Point(172,181), Point(153,192), Point(137,201), Point(123,211), \
+                                                    Point(112,220), Point(99,229), Point(90,237), Point(80,244), Point(73,250), Point(69,254), Point(69,252)] 
+recognizer = Recognizer()
+recognizer.recognize(input_points)
 
 
     
