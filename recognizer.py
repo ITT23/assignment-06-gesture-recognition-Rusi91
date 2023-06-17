@@ -10,6 +10,8 @@
 
 
 import math
+import time
+
 # point class for the x and y coordinates of a point of a gesture
 from point_class import Point
 # predefined gesture templates as a dictionary
@@ -47,10 +49,28 @@ class Recognizer():
         self.threshold = threshold
         self.size = size
         self.origin = origin
+        self.matching_template = ""
+        self.score = ""
+        self.inference_time = ""
         self.templates_dict:dict = load_templates(dollar_templates, self.size, self.origin)
+
+    def get_matching_template(self):
+        return self.matching_template
+    
+    def get_score(self):
+        return self.score
+    
+    def get_inference_time(self):
+        return self.inference_time
+    
+    def reset_recognizer(self):
+        self.matching_template = ""
+        self.score = ""
+        self.inference_time = ""
 
     # recognizes input gestures based on the predefined templates and returns the matching template and score
     def recognize(self, input_points:list[Point]):
+        inference_time_start = time.time()
         # adjusts the input points for the recognition process
         points = adjust_input_data(input_points, self.size, self.origin)
         b = math.inf
@@ -64,7 +84,10 @@ class Recognizer():
         # print results
         print(matching_template)
         print(template_score)
-        return matching_template, template_score
+
+        self.matching_template = matching_template
+        self.score = str(round(template_score, 2))
+        self.inference_time = get_inference_time(inference_time_start)
     
 # loads, adjusts and returns predefined templates for the further recognition process
 def load_templates(templates_dict:dict, size, origin):
@@ -111,9 +134,8 @@ def resample(points:list[Point], n=N):
     
 
     if len(new_points) == n - 1:  # prevent a roundoff error
-        number:int = 1
-        new_points.append(Point(points[len(points)-number].x, points[len(points-number)].y))
-        new_points.append(Point(points[len(poins)]))
+        new_points.append(Point(points[len(points) - 1].x, points[len(points) - 1].y))
+        #new_points.append(Point(points[len(points)]))
 
     return new_points
 
@@ -235,19 +257,20 @@ def path_distance(points:list[Point], template_values:list[Point]):
         d += get_distance(points[i], template_values[i])
     return d / len(points)
 
-# test recognizer with 'zick-zack' data
-input_points =  [Point(75,250), Point(75,247), Point(77,244), Point(78,242), Point(79,239), Point(80,237), Point(82,234), Point(82,232), Point(84,229), Point(85,225), \
-             Point(87,222), Point(88,219), Point(89,216), Point(91,212), Point(92,208), Point(94,204), Point(95,201), Point(96,196), Point(97,194), Point(98,191), Point(100,185), \
-                Point(102,178), Point(104,173), Point(104,171), Point(105,164), Point(106,158), Point(107,156), Point(107,152), Point(108,145), Point(109,141), Point(110,139), \
-                    Point(112,133), Point(113,131), Point(116,127), Point(117,125), Point(119,122), Point(121,121), Point(123,120), Point(125,122), Point(125,125), Point(127,130), \
-                        Point(128,133), Point(131,143), Point(136,153), Point(140,163), Point(144,172), Point(145,175), Point(151,189), Point(156,201), Point(161,213), \
-                            Point(166,225), Point(169,233), Point(171,236), Point(174,243), Point(177,247), Point(178,249), Point(179,251), Point(180,253), Point(180,255), \
-                                Point(179,257), Point(177,257), Point(174,255), Point(169,250), Point(164,247), Point(160,245), Point(149,238), Point(138,230), Point(127,221), \
-                                    Point(124,220), Point(112,212), Point(110,210), Point(96,201), Point(84,195), Point(74,190), Point(64,182), Point(55,175), Point(51,172), \
-                                        Point(49,170), Point(51,169), Point(56,169), Point(66,169), Point(78,168), Point(92,166), Point(107,164), Point(123,161), Point(140,162), \
-                                            Point(156,162), Point(171,160), Point(173,160), Point(186,160), Point(195,160), Point(198,161), Point(203,163), Point(208,163), \
-                                                Point(206,164), Point(200,167), Point(187,172), Point(174,179), Point(172,181), Point(153,192), Point(137,201), Point(123,211), \
-                                                    Point(112,220), Point(99,229), Point(90,237), Point(80,244), Point(73,250), Point(69,254), Point(69,252)] 
+# calculate inference time: https://stackoverflow.com/questions/1557571/how-do-i-get-time-of-a-python-programs-execution [17.06.23]
+def get_inference_time(start_time):
+    duration = time.time() - start_time
+    
+    return str(int(100*(round(duration, 2)))) + ' ms'
+
+# test recognizer with 'arrow' data
+input_points =  [ Point(68,222), Point(70,220), Point(73,218), Point(75,217), Point(77,215), Point(80,213), Point(82,212), Point(84,210), Point(87,209), Point(89,208), \
+              Point(92,206), Point(95,204), Point(101,201), Point(106,198), Point(112,194), Point(118,191), Point(124,187), Point(127,186), Point(132,183), Point(138,181), \
+                Point(141,180), Point(146,178), Point(154,173), Point(159,171), Point(161,170), Point(166,167), Point(168,167), Point(171,166), Point(174,164), Point(177,162), \
+                    Point(180,160), Point(182,158), Point(183,156), Point(181,154), Point(178,153), Point(171,153), Point(164,153), Point(160,153), Point(150,154), Point(147,155), \
+                        Point(141,157), Point(137,158), Point(135,158), Point(137,158), Point(140,157), Point(143,156), Point(151,154), Point(160,152), Point(170,149), \
+                            Point(179,147), Point(185,145), Point(192,144), Point(196,144), Point(198,144), Point(200,144), Point(201,147), Point(199,149), Point(194,157), \
+                                Point(191,160), Point(186,167), Point(180,176), Point(177,179), Point(171,187), Point(169,189), Point(165,194), Point(164,196)]
 recognizer = Recognizer()
 recognizer.recognize(input_points)
 

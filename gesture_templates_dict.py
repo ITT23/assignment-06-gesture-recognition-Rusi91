@@ -41,7 +41,6 @@ one_dollar_gesture_templates:dict = {
                     Point(124,125), Point(126,124), Point(129,125), Point(131,127), Point(132,130), Point(136,139), Point(141,154), Point(145,166), Point(151,182), Point(156,193), \
                         Point(157,196), Point(161,209), Point(162,211), Point(167,223), Point(169,229), Point(170,231), Point(173,237), Point(176,242), Point(177,244), \
                             Point(179,250), Point(181,255), Point(182,257)],
-    'zig-zag': [ Point(307,216), Point(333,186), Point(356,215), Point(375,186), Point(399,216), Point(418,186)],
     'arrow': [ Point(68,222), Point(70,220), Point(73,218), Point(75,217), Point(77,215), Point(80,213), Point(82,212), Point(84,210), Point(87,209), Point(89,208), \
               Point(92,206), Point(95,204), Point(101,201), Point(106,198), Point(112,194), Point(118,191), Point(124,187), Point(127,186), Point(132,183), Point(138,181), \
                 Point(141,180), Point(146,178), Point(154,173), Point(159,171), Point(161,170), Point(166,167), Point(168,167), Point(171,166), Point(174,164), Point(177,162), \
@@ -75,13 +74,6 @@ one_dollar_gesture_templates:dict = {
                     Point(177,208), Point(169,206), Point(162,205), Point(154,207), Point(145,209), Point(137,210), Point(129,214), Point(122,217), Point(118,218), \
                         Point(111,221), Point(109,222), Point(110,219), Point(112,217), Point(118,209), Point(120,207), Point(128,196), Point(135,187), Point(138,183), \
                             Point(148,167), Point(157,153), Point(163,145), Point(165,142), Point(172,133), Point(177,127), Point(179,127), Point(180,125)],
-    'left curly brace': [ Point(150,116), Point(147,117), Point(145,116), Point(142,116), Point(139,117), Point(136,117), Point(133,118), Point(129,121), Point(126,122), \
-                         Point(123,123), Point(120,125), Point(118,127), Point(115,128), Point(113,129), Point(112,131), Point(113,134), Point(115,134), Point(117,135), \
-                            Point(120,135), Point(123,137), Point(126,138), Point(129,140), Point(135,143), Point(137,144), Point(139,147), Point(141,149), Point(140,152), \
-                                Point(139,155), Point(134,159), Point(131,161), Point(124,166), Point(121,166), Point(117,166), Point(114,167), Point(112,166), Point(114,164), \
-                                    Point(116,163), Point(118,163), Point(120,162), Point(122,163), Point(125,164), Point(127,165), Point(129,166), Point(130,168), Point(129,171), \
-                                        Point(127,175), Point(125,179), Point(123,184), Point(121,190), Point(120,194), Point(119,199), Point(120,202), Point(123,207), \
-                                            Point(127,211), Point(133,215), Point(142,219), Point(148,220), Point(151,221)],
     'right curly brace': [ Point(117,132), Point(115,132), Point(115,129), Point(117,129), Point(119,128), Point(122,127), Point(125,127), Point(127,127), Point(130,127), \
                           Point(133,129), Point(136,129), Point(138,130), Point(140,131), Point(143,134), Point(144,136), Point(145,139), Point(145,142), Point(145,145), \
                             Point(145,147), Point(145,149), Point(144,152), Point(142,157), Point(141,160), Point(139,163), Point(137,166), Point(135,167), Point(133,169), \
