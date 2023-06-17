@@ -212,11 +212,12 @@ def distance_at_best_angle(points:list[Point], template_values:list[Point], angl
 
     return min(f1, f2)
 
-# two following functions needed to get the path distance between template and input points
+# get distance at a specific angle (radians)
 def distance_at_angle(points:list[Point], template_values:list[Point], radians):
     new_points = rotate_by(points, radians)
     return path_distance(new_points, template_values)
 
+# get path distance 
 def path_distance(points:list[Point], template_values:list[Point]):
     d = 0.0
     for i in range(len(points)):
