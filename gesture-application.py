@@ -3,16 +3,16 @@
 # gesture input program for first task
 
 import pyglet
-import time
 import random
 
 from pyglet import app, shapes, image
 from pyglet.window import Window
-from threading import Timer
 
 from point_class import Point
 from recognizer import Recognizer
 from rune_class import Rune
+from timer_class import Timer
+from player_class import Player
 
 # https://pyglet.readthedocs.io/en/latest/programming_guide/mouse.html
 
@@ -37,7 +37,6 @@ batch = pyglet.graphics.Batch()
 
 # stored points
 input_points:list[Point] = []
-input_points_mirrored:list[Point] = []
 
 arrow_rune = Rune("arrow")
 check_rune = Rune("check")
@@ -51,10 +50,15 @@ x_rune = Rune("x")
 runes_arr = [arrow_rune, check_rune, delete_rune, pigtail_rune, rectangle_rune, star_rune, triangle_rune, x_rune]
 current_rune = star_rune
 
-player_lifes_remaining = 5
+Player_LIFES = 5
+player = Player(Player_LIFES)
 
 # timer
-try_timer:Timer = None
+duration = 20.0
+timer = Timer(duration)
+
+
+recognizer = Recognizer()
 
 # create game window
 window = Window(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -62,50 +66,68 @@ window = Window(WINDOW_WIDTH, WINDOW_HEIGHT)
 def save_point(x:float, y:float):
     new_point = Point(x, y)
     input_points.append(new_point)
-    input_points_mirrored.append(Point(x, get_mirrored_y(y)))
+    recognizer.add_point(new_point.x, WINDOW_HEIGHT - new_point.y)
 
 def restart():
-    global input_points, input_points_mirrored
+    global input_points
     window.clear()
     input_points = []
-    input_points_mirrored = []
     recognizer.reset_recognizer()
 
-def timer(time_to_count):
-    global try_timer
-    try_timer = Timer()
+def trial_failed():
+    player.decrease_lifes()
+    timer.reset_timer()
+    restart()
 
-
-recognizer = Recognizer()
-
-# I adopted the get_mirrored_y method from Rosti97 (Sabrina Hößl) - ITT23/assignment-06-gesture-recognition-Rosti97 [17.06.23]
-# My input was often incorrectly recognized despite the working recognizer (I tested the recognizer with the templates and everything worked correctly).
-# Since at first glance she was trying a similar approach to mine, I compared her piece of code for storing the x and y coordinates to mine and noticed 
-# that she subtracts the y value from the height. I tried it out and my recognition was correct.
-def get_mirrored_y(y):
-    return WINDOW_HEIGHT-y
+# play sound if user achieved to draw the correct rune
+def play_success_sound():
+    success_sound = pyglet.media.load(Rune.success_sound_path(), streaming=False)
+    success_sound.play()
 
 @window.event
 def on_draw():
     window.clear()
     draw_background()
-    draw_remaining_tries()
-    draw_input()
-    #if recognizer.get_matching_template() != "":
-        #draw_result()
+    if player.get_lifes_amount() > 0:
+        draw_remaining_tries()
+        draw_timer()
+        draw_score()
+        draw_input()
+    else:
+        draw_result()
+    
 
 def draw_background():
-    motion_image = image.load(current_rune.get_rune_path())
-    motion_image.blit(0, 0)
+    if player.get_lifes_amount() > 0:
+        background_image = image.load(current_rune.get_rune_path())
+    else:
+        background_image = image.load(Rune.get_results_background_path())
+    background_image.blit(0, 0)
 
 # display of the player's remaining lives
 def draw_remaining_tries():
-    player_lifes = pyglet.text.Label("Tries: " + str(player_lifes_remaining),
+    player_lifes_label = pyglet.text.Label("Tries: " + str(player.get_lifes_amount()),
                           font_name='Times New Roman',
                           font_size=25,
                           x = WINDOW_WIDTH - WINDOW_WIDTH / 8, y = WINDOW_HEIGHT / 15,
                           anchor_x='center', anchor_y='center')
-    player_lifes.draw()
+    player_lifes_label.draw()
+
+def draw_timer():
+    timer_label = pyglet.text.Label("Timer: " + timer.get_timer_string(),
+                          font_name='Times New Roman',
+                          font_size=25,
+                          x = WINDOW_WIDTH - WINDOW_WIDTH / 7, y = WINDOW_HEIGHT - WINDOW_HEIGHT / 15,
+                          anchor_x='center', anchor_y='center')
+    timer_label.draw()
+
+def draw_score():
+    score_label = pyglet.text.Label("Score: " + str(player.get_score()),
+                          font_name='Times New Roman',
+                          font_size=25,
+                          x = WINDOW_WIDTH / 7, y = WINDOW_HEIGHT / 15,
+                          anchor_x='center', anchor_y='center')
+    score_label.draw()
 
 def draw_input():
     
@@ -123,32 +145,46 @@ def draw_first_input():
     first_input.draw()
 
 def draw_result():
-    result_label = pyglet.text.Label('Result: ' + recognizer.get_matching_template() + ' (' + recognizer.get_score() + ') ' + 'in ' + recognizer.get_inference_time(),
+    result_label = pyglet.text.Label('YOUR SCORE: ' + str(player.get_score()),
                           font_name='Times New Roman',
-                          font_size=20,
-                          x = WINDOW_WIDTH - WINDOW_WIDTH / 2, y = WINDOW_HEIGHT - WINDOW_HEIGHT / 20,
+                          font_size=40,
+                          x = WINDOW_WIDTH / 2, y = WINDOW_HEIGHT / 2,
                           anchor_x='center', anchor_y='center')
     result_label.draw()
 
 @window.event
 def on_mouse_press(x, y, button, modifiers):
-    restart()
+    timer.set_start()
     save_point(float(x), float(y))
 
 @window.event
 def on_mouse_drag(x, y, dx, dy, buttons, modifiers):
     save_point(float(x), float(y))
 
+    if timer.get_timer() <= 0:
+        player.decrease_lifes()
+        timer.reset_timer()
+        restart()
+
 @window.event
 def on_mouse_release(x, y, button, modifiers): 
-    global current_rune  
-    recognizer.recognize(input_points_mirrored)
-    if recognizer.get_matching_template() == current_rune.get_rune_name():
-        old_rune = current_rune
-        current_rune = random.choice(runes_arr)
-        while current_rune.get_rune_name() == old_rune.get_rune_name():
+    global current_rune
+    if timer.get_timer() <= 0:
+        trial_failed()
+    else:
+        recognizer.recognize()
+        if recognizer.get_matching_template() == current_rune.get_rune_name():
+            old_rune = current_rune
             current_rune = random.choice(runes_arr)
-        restart()
+            timer.reset_timer()
+            timer.decrease_timer_duration(1, 2)
+            player.increase_score()
+            play_success_sound()
+            restart()
+            while current_rune.get_rune_name() == old_rune.get_rune_name():
+                current_rune = random.choice(runes_arr)
+        else:
+            trial_failed()
 
 # run game
 app.run()

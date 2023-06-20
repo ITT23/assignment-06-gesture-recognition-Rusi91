@@ -78,9 +78,7 @@ class Recognizer():
 
     # recognizes input gestures based on the predefined templates and returns the matching template and score
     def recognize(self, input_points:list[Point]=None):
-        if not input_points:
-            raise Exception("The input array is empty")
-
+     
         if input_points == None:
             input_points = self.input_points
 

@@ -4,6 +4,11 @@ from os import path
 # https://stock.adobe.com/at/search?k=%22spell%20book%22
 # https://www.freeimages.com/premium-vector/old-open-magic-book-5706544?ref=365psd
 
+# path for the success sound (sound if user achieves to draw the correct rune)
+    # sound source: https://www.youtube.com/watch?v=_q8QmJadSEE -Piano Note C Sound Effect - @Sound Effects
+SUCCESS_SOUND_PATH = path.join(path.dirname(__file__), "music\success_sound.mp3")
+RESULTS_BACKGROUND_PATH = path.join(path.dirname(__file__), "game_images\\book.png")
+
 class Rune():
 
     def __init__(self, name:str) -> None:
@@ -16,5 +21,8 @@ class Rune():
     def get_rune_path(self):
         return self.path
     
-    def get_rune_draw_background():
-        return path.join(path.dirname(__file__), f"game_images\\book.png")
+    def get_results_background_path():
+        return RESULTS_BACKGROUND_PATH
+    
+    def success_sound_path():
+        return SUCCESS_SOUND_PATH
