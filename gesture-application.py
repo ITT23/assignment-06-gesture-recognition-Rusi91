@@ -47,12 +47,12 @@ RECT_CORRECTION = RECT_SIZE / 2
 
 # path for sounds (sound if user achieves or not achieves to draw the correct rune)
     # sound source: https://www.youtube.com/watch?v=_q8QmJadSEE -Piano Note C Sound Effect - @Sound Effects
-SUCCESS_SOUND_PATH = path.join(path.dirname(__file__), "..\material\game\music\success_sound.mp3")
+SUCCESS_SOUND_PATH = path.join(path.dirname(__file__), "material\game\music\success_sound.mp3")
     # https://www.youtube.com/watch?v=_XRnENg_QI0 -Error Sound Effect (HD) - @Servus
-FAIL_SOUND_PATH = path.join(path.dirname(__file__), "..\material\game\music\\fail_sound.mp3")
+FAIL_SOUND_PATH = path.join(path.dirname(__file__), "material\game\music\\fail_sound.mp3")
 # path for background image for results
     # https://www.freeimages.com/premium-vector/old-open-magic-book-5706544?ref=365psd
-RESULTS_BACKGROUND_PATH = path.join(path.dirname(__file__), "..\material\game\images\\book.png")
+RESULTS_BACKGROUND_PATH = path.join(path.dirname(__file__), "material\game\images\\book.png")
 
 # creating a batch object
 batch = pyglet.graphics.Batch()
@@ -194,14 +194,8 @@ def draw_result():
 
 @window.event
 def on_mouse_press(x, y, button, modifiers):
-    if player.get_lifes_amount() <= 0:
-        player.reset()
-        timer.reset_timer()
-        timer.set_duration(duration)
-        restart()
-    else:
-        timer.set_start()
-        save_point(float(x), float(y))
+    timer.set_start()
+    save_point(float(x), float(y))
 
 @window.event
 def on_mouse_drag(x, y, dx, dy, buttons, modifiers):
@@ -215,27 +209,33 @@ def on_mouse_drag(x, y, dx, dy, buttons, modifiers):
 @window.event
 def on_mouse_release(x, y, button, modifiers): 
     global current_rune
-    # if timer runs out
-    if timer.get_timer() <= 0:
-        trial_failed()
-    else:
-        recognizer.recognize()
-        # if rune was drawn correctly
-        if recognizer.get_matching_template() == current_rune.get_rune_name():
-            # show next rune to draw
-            old_rune = current_rune
-            current_rune = random.choice(runes_arr)
-            timer.reset_timer()
-            timer.decrease_timer_duration(1, DURATION_LIMIT)
-            player.increase_score()
-            play_success_sound()
-            restart()
-            # next rune is random but should not be the same
-            while current_rune.get_rune_name() == old_rune.get_rune_name():
-                current_rune = random.choice(runes_arr)
-        else:
-            # if rune was drawn incorrectly
+    if player.get_lifes_amount() > 0:
+        # if timer runs out
+        if timer.get_timer() <= 0:
             trial_failed()
+        else:
+            recognizer.recognize()
+            # if rune was drawn correctly
+            if recognizer.get_matching_template() == current_rune.get_rune_name():
+                # show next rune to draw
+                old_rune = current_rune
+                current_rune = random.choice(runes_arr)
+                timer.reset_timer()
+                timer.decrease_timer_duration(1, DURATION_LIMIT)
+                player.increase_score()
+                play_success_sound()
+                restart()
+                # next rune is random but should not be the same
+                while current_rune.get_rune_name() == old_rune.get_rune_name():
+                    current_rune = random.choice(runes_arr)
+            else:
+                # if rune was drawn incorrectly
+                trial_failed()
+    else:
+        player.reset()
+        timer.reset_timer()
+        timer.set_duration(duration)
+        restart()
 
 # run game
 app.run()
