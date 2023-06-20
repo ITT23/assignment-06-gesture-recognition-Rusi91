@@ -1,6 +1,0 @@
-,param_count_variant,prediction,inference_time
-0,paramt_count_16_prediction,correct,0.04 seconds
-1,paramt_count_32_prediction,correct,0.04 seconds
-2,paramt_count_64_prediction,correct,0.04 seconds
-3,paramt_count_128_prediction,correct,0.03 seconds
-4,paramt_count_256_prediction,correct,0.04 seconds
