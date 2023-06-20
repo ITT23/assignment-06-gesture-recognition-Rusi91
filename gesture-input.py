@@ -26,12 +26,13 @@ RECT_SIZE = 30
 # correction of the coordinates of the rectange to start the line from the center of the rectangle
 RECT_CORRECTION = RECT_SIZE / 2
 
+recognizer = Recognizer()
+
 # creating a batch object
 batch = pyglet.graphics.Batch()
 
 # stored points
 input_points:list[Point] = []
-input_points_mirrored:list[Point] = []
 
 # create game window
 window = Window(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -39,23 +40,14 @@ window = Window(WINDOW_WIDTH, WINDOW_HEIGHT)
 def save_point(x:float, y:float):
     new_point = Point(x, y)
     input_points.append(new_point)
-    input_points_mirrored.append(Point(x, get_mirrored_y(y)))
+    recognizer.add_point(new_point.x, WINDOW_HEIGHT - new_point.y)
 
 def restart():
-    global input_points, input_points_mirrored
+    global input_points
     window.clear()
     input_points = []
-    input_points_mirrored = []
+    #input_points_mirrored = []
     recognizer.reset_recognizer()
-
-recognizer = Recognizer()
-
-# I adopted the get_mirrored_y method from Rosti97 (Sabrina Hößl) - ITT23/assignment-06-gesture-recognition-Rosti97 [17.06.23]
-# My input was often incorrectly recognized despite the working recognizer (I tested the recognizer with the templates and everything worked correctly).
-# Since at first glance she was trying a similar approach to mine, I compared her piece of code for storing the x and y coordinates to mine and noticed 
-# that she subtracts the y value from the height. I tried it out and my recognition was correct.
-def get_mirrored_y(y):
-    return WINDOW_HEIGHT-y
 
 @window.event
 def on_draw():
@@ -98,7 +90,7 @@ def on_mouse_drag(x, y, dx, dy, buttons, modifiers):
 
 @window.event
 def on_mouse_release(x, y, button, modifiers):   
-    recognizer.recognize(input_points_mirrored)
+    recognizer.recognize()
 
 # run game
 app.run()

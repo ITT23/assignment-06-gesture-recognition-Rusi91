@@ -53,6 +53,7 @@ class Recognizer():
         self.score = ""
         self.inference_time = ""
         self.templates_dict:dict = load_templates(dollar_templates, self.size, self.origin)
+        self.input_points:list[Point] = []
 
     def get_matching_template(self):
         return self.matching_template
@@ -67,9 +68,22 @@ class Recognizer():
         self.matching_template = ""
         self.score = ""
         self.inference_time = ""
+        self.input_points = []
+
+    def add_point(self, x, y):
+        self.input_points.append(Point(x, y))
+
+    def get_input_points(self):
+        return self.input_points
 
     # recognizes input gestures based on the predefined templates and returns the matching template and score
-    def recognize(self, input_points:list[Point]):
+    def recognize(self, input_points:list[Point]=None):
+        if not input_points:
+            raise Exception("The input array is empty")
+
+        if input_points == None:
+            input_points = self.input_points
+
         inference_time_start = time.time()
         # adjusts the input points for the recognition process
         points = adjust_input_data(input_points, self.size, self.origin)
@@ -264,7 +278,8 @@ def get_inference_time(start_time):
     return str(int(100*(round(duration, 2)))) + ' ms'
 
 # test recognizer with 'arrow' data
-input_points =  [ Point(68,222), Point(70,220), Point(73,218), Point(75,217), Point(77,215), Point(80,213), Point(82,212), Point(84,210), Point(87,209), Point(89,208), \
+'''
+input_points =  [Point(68,222), Point(70,220), Point(73,218), Point(75,217), Point(77,215), Point(80,213), Point(82,212), Point(84,210), Point(87,209), Point(89,208), \
               Point(92,206), Point(95,204), Point(101,201), Point(106,198), Point(112,194), Point(118,191), Point(124,187), Point(127,186), Point(132,183), Point(138,181), \
                 Point(141,180), Point(146,178), Point(154,173), Point(159,171), Point(161,170), Point(166,167), Point(168,167), Point(171,166), Point(174,164), Point(177,162), \
                     Point(180,160), Point(182,158), Point(183,156), Point(181,154), Point(178,153), Point(171,153), Point(164,153), Point(160,153), Point(150,154), Point(147,155), \
@@ -273,11 +288,4 @@ input_points =  [ Point(68,222), Point(70,220), Point(73,218), Point(75,217), Po
                                 Point(191,160), Point(186,167), Point(180,176), Point(177,179), Point(171,187), Point(169,189), Point(165,194), Point(164,196)]
 recognizer = Recognizer()
 recognizer.recognize(input_points)
-
-
-    
-        
-        
-    
-	
-
+'''
