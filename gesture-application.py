@@ -75,14 +75,20 @@ def restart():
     recognizer.reset_recognizer()
 
 def trial_failed():
+    play_fail_sound()
     player.decrease_lifes()
     timer.reset_timer()
     restart()
 
-# play sound if user achieved to draw the correct rune
+# play success sound if user achieved to draw the correct rune
 def play_success_sound():
     success_sound = pyglet.media.load(Rune.success_sound_path(), streaming=False)
     success_sound.play()
+
+# play fail sound if user don't achieved to draw the correct rune
+def play_fail_sound():
+    fail_sound = pyglet.media.load(Rune.fail_sound_path(), streaming=False)
+    fail_sound.play()
 
 @window.event
 def on_draw():
