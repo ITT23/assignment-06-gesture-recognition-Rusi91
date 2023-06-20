@@ -1,7 +1,12 @@
 class Player():
 
     def __init__(self, start_lifes):
+        self.start_lifes = start_lifes
         self.lifes = start_lifes
+        self.score = 0
+    
+    def reset(self):
+        self.lifes = self.start_lifes
         self.score = 0
 
     def decrease_lifes(self):

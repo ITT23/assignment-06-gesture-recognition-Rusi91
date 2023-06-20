@@ -6,16 +6,17 @@
 # Jacob Wobbrock's Website on Gesture RecognitionLink/URL - https://depts.washington.edu/acelab/proj/dollar/index.html [14.06.23]
 #   -> Paper for understanding the architecture and functionality: http://faculty.washington.edu/wobbrock/pubs/uist-07.01.pdf [14.06.23]
 #   -> Pseudocode: https://depts.washington.edu/acelab/proj/dollar/dollar.pdf [14.06.23]
-#   -> source code in JavaScript: https://depts.washington.edu/acelab/proj/dollar/dollar.js [14.06.23]
-
+#   -> source code in JavaScript: https://depts.washington.edu/acelab/proj/dollar/dollar.js [14.06.23] 
+#       -> useful if you don't know exactly what is meant at a certain point in the pseudocode or for refining the code 
+#         (e.g. a method to avoid round-off bugs is descriped/shown in the source code)
 
 import math
 import time
 
 # point class for the x and y coordinates of a point of a gesture
-from point_class import Point
+from helper_classes.point_class import Point
 # predefined gesture templates as a dictionary
-from gesture_templates_dict import one_dollar_gesture_templates
+from material.dictionary.gesture_templates_dict import one_dollar_gesture_templates
 
 # golden ratio - phi
 # need to calculate the distance at the best angle
@@ -55,30 +56,39 @@ class Recognizer():
         self.templates_dict:dict = load_templates(dollar_templates, self.size, self.origin)
         self.input_points:list[Point] = []
 
+    # get result: matching template
     def get_matching_template(self):
         return self.matching_template
     
+    # get result: score 
     def get_score(self):
         return self.score
     
+    # get result: inference time for the recognition process
     def get_inference_time(self):
         return self.inference_time
     
+    # reset results and input points
     def reset_recognizer(self):
         self.matching_template = ""
         self.score = ""
         self.inference_time = ""
         self.input_points = []
 
+    # add ne point to the input points array
+    # parameters are the raw data for x and y
     def add_point(self, x, y):
         self.input_points.append(Point(x, y))
 
+    # get input points array
     def get_input_points(self):
         return self.input_points
 
     # recognizes input gestures based on the predefined templates and returns the matching template and score
+        # the input points can either be passed using the add_point method (in this case the recognize function itself accesses the filled array) 
+        # or an array can be passed directly to the recognize function.
     def recognize(self, input_points:list[Point]=None):
-     
+        # If users use the add_point method for filling the input_points array.
         if input_points == None:
             input_points = self.input_points
 
@@ -219,7 +229,7 @@ def bounding_box(points:list[Point]):
     #min_x, max_x = math.inf, -math.inf
     #min_y, max_y = math.inf, -math.inf
 
-    # infinity (suggested by the pseudocode) leads to some bugs while init the values with 0 performs without problems
+    # infinity (suggested by the pseudocode) leads to some bugs while initialising the values with 0 performs without problems
     min_x, max_x, min_y, max_y = 0, 0, 0, 0
 
     for i in range(len(points)):
@@ -269,11 +279,11 @@ def path_distance(points:list[Point], template_values:list[Point]):
         d += get_distance(points[i], template_values[i])
     return d / len(points)
 
-# calculate inference time: https://stackoverflow.com/questions/1557571/how-do-i-get-time-of-a-python-programs-execution [17.06.23]
+# calculate inference time
 def get_inference_time(start_time):
+    # https://stackoverflow.com/questions/1557571/how-do-i-get-time-of-a-python-programs-execution [17.06.23]
     duration = time.time() - start_time
-    
-    return str(int(100*(round(duration, 2)))) + ' ms'
+    return str(int(100*(round(duration, 2)))) + ' ms' # example: '1 ms'
 
 # test recognizer with 'arrow' data
 '''

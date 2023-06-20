@@ -1,4 +1,4 @@
-from point_class import Point
+from helper_classes.point_class import Point
 
 one_dollar_gesture_templates:dict = {
     'triangle': [Point(137,139), Point(135,141), Point(133,144), Point(132,146), Point(130,149), Point(128,151), Point(126,155), Point(123,160), \
