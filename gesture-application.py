@@ -48,7 +48,7 @@ RECT_CORRECTION = RECT_SIZE / 2
 # path for sounds (sound if user achieves or not achieves to draw the correct rune)
     # sound source: https://www.youtube.com/watch?v=_q8QmJadSEE -Piano Note C Sound Effect - @Sound Effects
 SUCCESS_SOUND_PATH = path.join(path.dirname(__file__), "material\game\music\success_sound.mp3")
-    # https://www.youtube.com/watch?v=_XRnENg_QI0 -Error Sound Effect (HD) - @Servus
+    # sound source: https://www.youtube.com/watch?v=KogF3sJ8dB4 -Funny Game Lose Tone | Free Sound Effect
 FAIL_SOUND_PATH = path.join(path.dirname(__file__), "material\game\music\\fail_sound.mp3")
 # path for background image for results
     # https://www.freeimages.com/premium-vector/old-open-magic-book-5706544?ref=365psd
