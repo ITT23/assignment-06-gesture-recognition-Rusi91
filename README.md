@@ -28,6 +28,13 @@ GAME:
 - timer, score and remainig lifes are shown in the corners
 - sounds are played for success or fails [sound-files: material\music\]{helper_class: helper_classes\rune_class.py}
 
+**unistroke-gestures.ipynb**
+All results have been saved in the 'task_two_results' folder.
+It contains the plotted results of the history, the configuration matrices and the results of the predictions for each variant.
+
+I chose the values ​​16, 32, 64, 128, 256 for the systematic comparison of different values ​​for 'number of parameters'.
+We used the value 64 in the exercise. That's why I wanted to increase and decrease the value twice. Always by half in order to get a systematic difference between the values ​​and to be able to compare them better.
+
 **helper_classes folder**
 contains classes i wrote to maintain the code clear and legible
 
@@ -38,3 +45,6 @@ player_class.py -> class for player attributes (game for task 3)
 
 **material folder**
 contains the gesture templates for the 1 dollar recognizer and the image material (images and soundtracks)
+
+**task_two_results**
+results stored as plots, csv data and configuration matrices.
